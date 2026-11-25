@@ -1,0 +1,184 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Which Move Next? Solving Equations (BETA): Demo and Setup</title>
+</head>
+<body>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,800&amp;family=Lexend:wght@400;500;600&amp;display=swap" rel="stylesheet">
+<style>
+html,body{margin:0}
+*{box-sizing:border-box}
+a{color:#2B2622}
+</style>
+<div style="background:#FBF7EE;color:#2B2622;font-family:Lexend,system-ui,sans-serif;font-size:17px;line-height:1.55;min-height:100vh">
+
+<!-- Header -->
+<div style="max-width:1120px;margin:0 auto;padding:22px 32px;display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:16px">
+  <a href="index.html" style="display:flex;align-items:center;gap:12px;text-decoration:none">
+    <span aria-hidden="true" style="display:flex">
+      <span style="width:22px;height:22px;border-radius:50%;background:#F3C969;border:2px solid #2B2622"></span>
+      <span style="width:22px;height:22px;border-radius:50%;background:#2F7D4F;border:2px solid #2B2622;margin-left:-8px"></span>
+      <span style="width:22px;height:22px;border-radius:50%;background:#C8462F;border:2px solid #2B2622;margin-left:-8px"></span>
+    </span>
+    <span style="font-family:Fraunces,Georgia,serif;font-weight:800;font-size:24px;color:#2B2622">Test Kitchen</span>
+  </a>
+  <nav style="display:flex;flex-wrap:wrap;gap:8px 26px;font-weight:500;font-size:16px">
+    <a href="index.html#activities" style="text-decoration:none;padding:10px 0;display:inline-block">Activities</a>
+    <a href="index.html#how" style="text-decoration:none;padding:10px 0;display:inline-block">How it works</a>
+    <a href="#setup" style="text-decoration:none;padding:10px 0;display:inline-block">Setup guide</a>
+  </nav>
+</div>
+
+<!-- Title + demo -->
+<div style="max-width:1120px;margin:0 auto;padding:28px 32px 56px;border-top:2px solid #2B2622;display:flex;flex-direction:column;gap:20px">
+  <div style="font-size:15px;color:#5F564B"><a href="index.html" style="color:#A33A22;font-weight:500">All activities</a> / Which Move Next? Solving Equations</div>
+  <h1 style="margin:0;font-family:Fraunces,Georgia,serif;font-weight:800;font-size:52px;line-height:1.05;letter-spacing:-0.01em">Which Move Next? Solving Equations</h1>
+  <div style="display:flex;flex-wrap:wrap;gap:8px">
+    <span style="background:#C8462F;color:#FFFFFF;font-size:13px;font-weight:600;letter-spacing:0.08em;padding:4px 12px;border-radius:999px">BETA</span>
+    <span style="background:#2B2622;color:#FBF7EE;font-size:13px;font-weight:500;padding:4px 12px;border-radius:999px">Math</span>
+    <span style="background:#F3C969;border:1px solid #2B2622;font-size:13px;font-weight:500;padding:3px 12px;border-radius:999px">Step by step</span>
+    <span style="background:#BCD9D2;border:1px solid #2B2622;font-size:13px;font-weight:500;padding:3px 12px;border-radius:999px">4 activities, 14 problems</span>
+    <span style="background:#FFFFFF;border:1px solid #2B2622;font-size:13px;font-weight:500;padding:3px 12px;border-radius:999px">Saves to Google Sheets</span>
+  </div>
+  <div style="background:#FFF8E4;border:2px solid #C8462F;border-radius:12px;padding:14px 18px;font-size:16px;max-width:74ch">
+    <b>This is a BETA activity.</b> It is still being worked on, so problems, wording, and saved results may change. Try it with a small group first, and expect updates.
+  </div>
+  <p style="margin:0;font-size:20px;color:#5F564B;max-width:60ch">Students read a short box, then choose the best next move to solve an equation. Their work builds down the page like a notebook, and every wrong choice explains why. They practice two-step equations, variables on both sides, and distributing. Each solved problem saves to your Sheet.</p>
+
+  <div style="display:flex;flex-wrap:wrap;gap:32px;align-items:flex-start;padding-top:12px">
+    <!-- Preview of the activity -->
+    <div style="flex:1 1 520px;min-width:0;background:#FFFFFF;border:2px solid #2B2622;border-radius:36px 8px 36px 8px;overflow:hidden;box-shadow:0 6px 0 rgba(43,38,34,0.15)">
+      <div style="background:#F3C969;border-bottom:2px solid #2B2622;padding:10px 20px;display:flex;flex-wrap:wrap;gap:8px;font-size:13px;font-weight:600">
+        <span style="background:#2B2622;color:#FBF7EE;padding:4px 12px;border-radius:999px">1 · Two-Step</span>
+        <span style="padding:4px 8px">2 · Variables on Both Sides</span>
+        <span style="padding:4px 8px">3 · Distribute First</span>
+        <span style="padding:4px 8px">4 · Mixed Challenge</span>
+      </div>
+      <div style="padding:22px;display:flex;flex-direction:column;gap:14px">
+        <div style="font-family:Fraunces,Georgia,serif;font-weight:800;font-size:24px">Two-Step Equations</div>
+        <div style="border:2px solid #2B2622;border-radius:14px;padding:10px 16px;font-family:Fraunces,Georgia,serif;font-weight:800;font-size:26px;text-align:center;line-height:1.35">
+          <div>3x + 5 = 20</div>
+          <div style="font-family:Lexend,system-ui,sans-serif;font-size:14px;font-weight:600;color:#1F6B3F;text-align:left">&#9666; Subtract 5 from both sides</div>
+          <div style="font-size:20px;color:#A33A22">&minus; 5&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&minus; 5</div>
+          <div style="border-top:3px solid #2B2622;margin:2px 0"></div>
+          <div style="background:#FFF8E4;border-radius:8px;font-size:34px">3x = 15</div>
+        </div>
+        <div style="font-weight:600;font-size:15px">Step 2: which move comes next?</div>
+        <div style="display:flex;flex-wrap:wrap;gap:8px">
+          <span style="background:#FFFFFF;border:2px solid #2B2622;border-radius:10px;padding:6px 12px;font-weight:600;font-size:14px">Divide both sides by 3</span>
+          <span style="background:#FBE1DC;border:2px solid #C8462F;border-radius:10px;padding:6px 12px;font-weight:600;font-size:14px">&#10007; Multiply both sides by 3</span>
+          <span style="background:#FFFFFF;border:2px solid #2B2622;border-radius:10px;padding:6px 12px;font-weight:600;font-size:14px">Subtract 3 from both sides</span>
+        </div>
+        <div style="background:#FFF8E4;border:2px solid #F3C969;border-radius:12px;padding:10px 14px;font-size:14px">x is already multiplied by that number. To undo multiplying, divide.</div>
+      </div>
+    </div>
+
+    <!-- Demo call to action -->
+    <div style="flex:1 1 300px;min-width:0;display:flex;flex-direction:column;gap:16px">
+      <h2 style="margin:0;font-family:Fraunces,Georgia,serif;font-weight:800;font-size:30px;line-height:1.15">Try it as a student</h2>
+      <p style="margin:0;color:#5F564B">The demo works exactly like the version your class would use, but results are not saved. This activity is in BETA, so you may see changes.</p>
+      <a href="demo/which-move-next.html" style="align-self:flex-start;display:inline-flex;align-items:center;min-height:48px;padding:0 26px;background:#C8462F;color:#FFFFFF;font-weight:600;text-decoration:none;border:2px solid #2B2622;border-radius:12px;box-shadow:0 3px 0 #2B2622">Open the live demo</a>
+      <span style="font-size:14px;color:#5F564B">The demo runs in preview mode, so nothing is saved.</span>
+    </div>
+  </div>
+</div>
+
+<!-- Setup -->
+<div id="setup" style="border-top:2px solid #2B2622;background:#F1E8D4">
+  <div style="max-width:1120px;margin:0 auto;padding:56px 32px 64px;display:flex;flex-direction:column;gap:32px">
+    <div style="display:flex;flex-direction:column;gap:8px">
+      <h2 style="margin:0;font-family:Fraunces,Georgia,serif;font-weight:800;font-size:40px;line-height:1.1">Set up your own copy</h2>
+      <p style="margin:0;color:#5F564B;font-size:18px">About five minutes. You need a Google account and a Google Sheet.</p>
+    </div>
+
+    <div style="display:flex;flex-wrap:wrap;gap:40px;align-items:flex-start">
+      <!-- Steps -->
+      <ol style="flex:1 1 520px;min-width:0;margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:18px">
+        <li style="background:#FFFFFF;border:2px solid #2B2622;border-radius:20px 6px 20px 6px;padding:20px 22px;display:flex;gap:16px">
+          <span style="flex:none;width:40px;height:40px;border-radius:50%;background:#2B2622;color:#FBF7EE;display:flex;align-items:center;justify-content:center;font-weight:600">1</span>
+          <div style="display:flex;flex-direction:column;gap:10px;min-width:0">
+            <h3 style="margin:0;font-family:Fraunces,Georgia,serif;font-weight:800;font-size:22px">Download the two files</h3>
+            <div style="display:flex;flex-wrap:wrap;gap:10px">
+              <a href="downloads/which-move-next/Index.html" download style="display:inline-flex;align-items:center;gap:8px;min-height:44px;padding:0 18px;background:#FFFFFF;color:#2B2622;font-weight:600;font-size:15px;text-decoration:none;border:2px solid #2B2622;border-radius:10px;box-shadow:0 3px 0 #2B2622">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#2B2622" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v12M6 11l6 6 6-6M5 20h14"></path></svg>Index.html</a>
+              <a href="downloads/which-move-next/Code.gs" download style="display:inline-flex;align-items:center;gap:8px;min-height:44px;padding:0 18px;background:#FFFFFF;color:#2B2622;font-weight:600;font-size:15px;text-decoration:none;border:2px solid #2B2622;border-radius:10px;box-shadow:0 3px 0 #2B2622">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#2B2622" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v12M6 11l6 6 6-6M5 20h14"></path></svg>Code.gs</a>
+            </div>
+            <p style="margin:0;font-size:15px;color:#5F564B">If a file opens as a page in your browser, press <b>Ctrl+U</b> to see the code. Select it all and copy.</p>
+          </div>
+        </li>
+        <li style="background:#FFFFFF;border:2px solid #2B2622;border-radius:6px 20px 6px 20px;padding:20px 22px;display:flex;gap:16px">
+          <span style="flex:none;width:40px;height:40px;border-radius:50%;background:#2B2622;color:#FBF7EE;display:flex;align-items:center;justify-content:center;font-weight:600">2</span>
+          <div style="display:flex;flex-direction:column;gap:6px;min-width:0">
+            <h3 style="margin:0;font-family:Fraunces,Georgia,serif;font-weight:800;font-size:22px">Make a new Google Sheet</h3>
+            <p style="margin:0">Name it anything you like. This is where student results will land.</p>
+          </div>
+        </li>
+        <li style="background:#FFFFFF;border:2px solid #2B2622;border-radius:20px 6px 20px 6px;padding:20px 22px;display:flex;gap:16px">
+          <span style="flex:none;width:40px;height:40px;border-radius:50%;background:#2B2622;color:#FBF7EE;display:flex;align-items:center;justify-content:center;font-weight:600">3</span>
+          <div style="display:flex;flex-direction:column;gap:6px;min-width:0">
+            <h3 style="margin:0;font-family:Fraunces,Georgia,serif;font-weight:800;font-size:22px">Paste the files into Apps Script</h3>
+            <p style="margin:0">In the Sheet, choose <b>Extensions</b>, then <b>Apps Script</b>. Paste <b>Code.gs</b> into the Code.gs file. Add an HTML file named exactly <b>Index</b> and paste <b>Index.html</b> into it.</p>
+          </div>
+        </li>
+        <li style="background:#FFFFFF;border:2px solid #2B2622;border-radius:6px 20px 6px 20px;padding:20px 22px;display:flex;gap:16px">
+          <span style="flex:none;width:40px;height:40px;border-radius:50%;background:#2B2622;color:#FBF7EE;display:flex;align-items:center;justify-content:center;font-weight:600">4</span>
+          <div style="display:flex;flex-direction:column;gap:6px;min-width:0">
+            <h3 style="margin:0;font-family:Fraunces,Georgia,serif;font-weight:800;font-size:22px">Publish it as a web app</h3>
+            <p style="margin:0">Choose <b>Deploy</b>, then <b>New deployment</b>, then <b>Web app</b>. Set <b>Execute as</b> to <b>Me</b>. Set <b>Who has access</b> to your school domain. Approve the permissions when asked.</p>
+          </div>
+        </li>
+        <li style="background:#FFFFFF;border:2px solid #2B2622;border-radius:20px 6px 20px 6px;padding:20px 22px;display:flex;gap:16px">
+          <span style="flex:none;width:40px;height:40px;border-radius:50%;background:#2B2622;color:#FBF7EE;display:flex;align-items:center;justify-content:center;font-weight:600">5</span>
+          <div style="display:flex;flex-direction:column;gap:6px;min-width:0">
+            <h3 style="margin:0;font-family:Fraunces,Georgia,serif;font-weight:800;font-size:22px">Share the link with students</h3>
+            <p style="margin:0">Copy the web app link and post it in your class. Students type their name once and results appear in a Results tab in your Sheet.</p>
+          </div>
+        </li>
+      </ol>
+
+      <!-- Sheet preview -->
+      <div style="flex:1 1 340px;min-width:0;display:flex;flex-direction:column;gap:14px">
+        <h3 style="margin:0;font-family:Fraunces,Georgia,serif;font-weight:800;font-size:26px;line-height:1.15">What you'll see in your Sheet</h3>
+        <div style="overflow-x:auto;background:#FFFFFF;border:2px solid #2B2622;border-radius:12px">
+          <table style="border-collapse:collapse;width:100%;min-width:420px;font-size:14px">
+            <thead>
+              <tr style="background:#F3C969">
+                <th scope="col" style="text-align:left;padding:8px 10px;border-bottom:2px solid #2B2622">Name</th>
+                <th scope="col" style="text-align:left;padding:8px 10px;border-bottom:2px solid #2B2622">Period</th>
+                <th scope="col" style="text-align:left;padding:8px 10px;border-bottom:2px solid #2B2622">Activity</th>
+                <th scope="col" style="text-align:left;padding:8px 10px;border-bottom:2px solid #2B2622">Correct</th>
+                <th scope="col" style="text-align:left;padding:8px 10px;border-bottom:2px solid #2B2622">Tries</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td style="padding:8px 10px;border-bottom:1px solid #D9CDB3">Maya R.</td><td style="padding:8px 10px;border-bottom:1px solid #D9CDB3">3</td><td style="padding:8px 10px;border-bottom:1px solid #D9CDB3">Two-Step Equations</td><td style="padding:8px 10px;border-bottom:1px solid #D9CDB3">8 / 8</td><td style="padding:8px 10px;border-bottom:1px solid #D9CDB3">1</td></tr>
+              <tr><td style="padding:8px 10px;border-bottom:1px solid #D9CDB3">Jordan T.</td><td style="padding:8px 10px;border-bottom:1px solid #D9CDB3">3</td><td style="padding:8px 10px;border-bottom:1px solid #D9CDB3">Distribute First</td><td style="padding:8px 10px;border-bottom:1px solid #D9CDB3">9 / 11</td><td style="padding:8px 10px;border-bottom:1px solid #D9CDB3">2</td></tr>
+              <tr><td style="padding:8px 10px">Alex P.</td><td style="padding:8px 10px">5</td><td style="padding:8px 10px">Mixed Challenge</td><td style="padding:8px 10px">10 / 11</td><td style="padding:8px 10px">1</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p style="margin:0;font-size:15px;color:#5F564B">One row per student per activity. Correct counts the moves a student got right on the first try. If a student retries, their row updates with the newest score and the tries count goes up.</p>
+
+        <div style="background:#FFF8E4;border:2px solid #F3C969;border-radius:12px;padding:14px 16px;font-size:15px">
+          <b>Good to know.</b> It works on Chromebooks and phones. After you edit a file in Apps Script, publish a new version so students see the update.
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Footer -->
+<div style="border-top:2px solid #2B2622">
+  <div style="max-width:1120px;margin:0 auto;padding:28px 32px 40px;display:flex;flex-wrap:wrap;justify-content:space-between;gap:12px;font-size:15px;color:#5F564B">
+    <a href="index.html" style="color:#A33A22;font-weight:500">Back to all activities</a>
+    <!-- Add your contact or "buy us a coffee" link here -->
+  </div>
+</div>
+
+</div>
+</body>
+</html>
