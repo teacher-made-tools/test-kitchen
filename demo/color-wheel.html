@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Color Wheel</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,800&family=Lexend:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{--paper:#fbf7ee;--line:#e6dcc6;--ink:#2b2622;--muted:#6f655a;--tomato:#c8462f;--basil:#2f7d4f;--butter:#f3c969;
+    --shadow:0 2px 0 rgba(43,38,34,.12),0 6px 14px rgba(43,38,34,.08)}
+  *{box-sizing:border-box}
+  body{margin:0;font-family:Lexend,system-ui,sans-serif;color:var(--ink);background:var(--paper);
+    background-image:repeating-linear-gradient(to bottom,transparent 0 31px,var(--line) 31px 32px);min-height:100vh}
+  header{padding:22px 20px 8px 64px;max-width:1100px;margin:0 auto}
+  header::before{content:"";position:fixed;left:44px;top:0;bottom:0;width:2px;background:#e8a3a3;opacity:.7}
+  h1{font-family:Fraunces,Georgia,serif;font-weight:800;font-size:clamp(26px,4vw,38px);margin:0 0 4px}
+  .sub{color:var(--muted);margin:0;font-weight:700}
+  nav{display:flex;gap:8px;flex-wrap:wrap;padding:14px 20px 0 64px;max-width:1100px;margin:0 auto}
+  nav button{font:inherit;font-weight:800;border:2px solid var(--ink);background:#fff;border-radius:10px 10px 0 0;padding:10px 16px;cursor:pointer;border-bottom-width:0;color:var(--ink)}
+  nav button[aria-selected="true"]{background:var(--butter)}
+  main{max-width:1100px;margin:0 auto;padding:0 20px 40px 64px}
+  .sheet{background:rgba(255,255,255,.88);border:2px solid var(--ink);border-radius:0 14px 14px 14px;padding:20px}
+  .sheet h2{font-family:Fraunces,Georgia,serif;margin:0 0 4px;font-size:24px}
+  .directions{margin:0 0 14px;color:var(--muted);font-weight:700}
+  .bank{min-height:60px;border:2px dashed #c9bda5;border-radius:12px;padding:10px;display:flex;flex-wrap:wrap;gap:8px;background:#fffdf7;margin-bottom:14px;align-content:flex-start}
+  .bank.empty::after{content:"All labels placed! Press Check my answers.";color:var(--muted);font-weight:700;align-self:center;padding:4px}
+  .scroller{overflow-x:auto;-webkit-overflow-scrolling:touch}
+  .diagram{position:relative;container-type:inline-size;min-width:640px;background:#fff;border:2px solid var(--ink);border-radius:14px}
+  .diagram svg{display:block;width:100%;height:auto}
+  .slot{position:absolute;border:2px dashed #8f8474;border-radius:9px;background:rgba(255,253,247,.95);display:flex;align-items:center;justify-content:center;
+    font-size:clamp(11px,1.45cqw,16px);cursor:pointer;transition:box-shadow .12s,transform .12s}
+  .slot.over{box-shadow:0 0 0 4px var(--butter);transform:scale(1.05)}
+  .slot.filled{border-style:solid;border-color:transparent;background:transparent}
+  .slot.right{box-shadow:0 0 0 3px var(--basil)}
+  .slot.wrong{box-shadow:0 0 0 3px var(--tomato)}
+  .label{touch-action:none;user-select:none;-webkit-user-select:none;background:#fff;border:2px solid var(--ink);border-radius:9px;padding:7px 11px;font-weight:800;
+    cursor:grab;box-shadow:var(--shadow);font-size:15px;white-space:nowrap;display:inline-flex;align-items:center;gap:5px}
+  .slot .label{width:100%;height:100%;justify-content:center;padding:2px 4px;font-size:inherit;box-shadow:none}
+  .label:focus-visible{outline:3px solid var(--tomato);outline-offset:2px}
+  .label.selected{background:var(--butter)}
+  .label.dragging{opacity:.3}
+  .label.right{background:#dff1e5;border-color:var(--basil)}
+  .label.right::before{content:"✓";color:var(--basil)}
+  .label.wrong{background:#fbe1dc;border-color:var(--tomato)}
+  .label.wrong::before{content:"✗";color:var(--tomato)}
+  .ghost{position:fixed;pointer-events:none;z-index:50;transform:rotate(-3deg) scale(1.05);box-shadow:0 10px 24px rgba(0,0,0,.2)}
+  .controls{display:flex;gap:10px;flex-wrap:wrap;margin-top:16px;align-items:center}
+  .btn{font:inherit;font-weight:800;border:2px solid var(--ink);border-radius:10px;padding:10px 18px;cursor:pointer;background:#fff;color:var(--ink);box-shadow:0 3px 0 var(--ink)}
+  .btn:active{transform:translateY(2px);box-shadow:0 1px 0 var(--ink)}
+  .btn.primary{background:var(--tomato);color:#fff}
+  .score{font-weight:800;font-size:18px}
+  .feedback{margin-top:14px;padding:12px 14px;border-radius:12px;background:#fff8e4;border:2px solid var(--butter)}
+  .feedback ul{margin:6px 0 0;padding-left:20px}
+  .tip{font-size:13px;color:var(--muted);font-weight:700;margin-top:10px}
+  @media (max-width:600px){header,nav,main{padding-left:16px}header::before{display:none}}
+  .student{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px;align-items:center}
+  .student label{font-weight:800;display:flex;gap:6px;align-items:center}
+  .student input{font:inherit;font-weight:700;border:2px solid var(--ink);border-radius:9px;padding:7px 10px;background:#fff;min-width:0}
+  #stuName{width:220px} #stuPeriod{width:90px}
+  .send{margin-top:12px;padding-top:12px;border-top:2px dashed #e2c87a;display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+  .send .btn{text-decoration:none;background:var(--basil);color:#fff;display:inline-block}
+  .send small{color:var(--muted);font-weight:700}
+
+  .read{background:#fff8e4;border:2px solid var(--butter);border-radius:12px;padding:12px 16px;margin:10px 0 14px;line-height:1.55;font-size:15px;font-weight:500}
+  .read summary{cursor:pointer;font-weight:700;font-size:16px;font-family:Fraunces,Georgia,serif;margin-bottom:6px}.read .tg{font:500 12px Lexend,sans-serif;color:var(--muted)}
+  .bank{position:sticky;top:0;z-index:5;box-shadow:0 6px 8px -6px rgba(0,0,0,.25)}
+  .read h3{margin:0 0 6px;font-size:16px;font-family:Fraunces,Georgia,serif}
+  .read p{margin:0 0 6px} .read ul{margin:4px 0 0;padding-left:20px} .read li{margin-bottom:3px}
+  .hint{flex-basis:100%;color:var(--muted);font-weight:600;font-size:13px}
+  .savestatus{margin-top:10px;padding-top:10px;border-top:2px dashed #e2c87a;font-weight:700;font-size:14px}
+  .savestatus.ok{color:var(--basil)} .savestatus.bad{color:var(--tomato)}
+  .submitAll{margin-top:18px;background:#fff;border:2px solid var(--ink);border-radius:14px;padding:16px 20px}
+  .submitAll h2{font-family:Fraunces,Georgia,serif;margin:0 0 6px;font-size:22px}
+  .submitAll ul{margin:6px 0 12px;padding-left:0;list-style:none;font-weight:700}
+  .submitAll .done{color:var(--basil)} .submitAll .todo{color:var(--tomato)}
+  .submitAll small{display:block;margin-top:8px;color:var(--muted);font-weight:700}
+  .sheet{margin-top:0}
+</style>
+</head>
+<body>
+<header>
+  <h1>The Color Wheel</h1>
+  <p class="sub">Read the short box, then drag each label onto the correct blank. On a touchscreen you can also tap a label, then tap a blank.</p>
+  <div class="student">
+    <label>Name <input id="stuName" autocomplete="name" placeholder="First and last name"></label>
+    <label>Period <input id="stuPeriod" placeholder="e.g. 3"></label>
+    <small class="hint">Type your name once. Your work saves automatically each time you press <b>Check my answers</b>.</small>
+  </div>
+</header>
+<nav role="tablist" id="tabs"></nav>
+<main><section class="sheet" id="sheet"></section><section class="submitAll" id="submitAll"></section></main>
+
+<script>
+/* ---------- Diagrams (SVG drawn in viewBox units) ---------- */
+const BROWN="#8a6a43";
+function polar(cx,cy,r,deg){const a=deg*Math.PI/180;return [cx+r*Math.cos(a),cy+r*Math.sin(a)];}
+function rng(seed){let s=seed;return ()=>{s=(s*1664525+1013904223)%4294967296;return s/4294967296;};}
+
+/* ---------- Color wheel (12 colors, red-yellow-blue) ---------- */
+const WC=[550,320], RO=190, RI=58;
+const HUES=[["Yellow","#f7dc2f"],["Yellow-Green","#a8cf3a"],["Green","#3ea64b"],["Blue-Green","#1f9d9a"],["Blue","#2d63c8"],["Blue-Violet","#4b4bb8"],["Violet","#7b3fa6"],["Red-Violet","#b0327e"],["Red","#e0302f"],["Red-Orange","#e8562a"],["Orange","#f28a1e"],["Yellow-Orange","#f6b01e"]];
+const ang=k=>-90+30*k;
+const pt=(r,k)=>polar(WC[0],WC[1],r,ang(k));
+function sector(k){
+  const a0=ang(k)-15,a1=ang(k)+15,[x1,y1]=polar(WC[0],WC[1],RO,a0),[x2,y2]=polar(WC[0],WC[1],RO,a1),[x3,y3]=polar(WC[0],WC[1],RI,a1),[x4,y4]=polar(WC[0],WC[1],RI,a0);
+  return `M${x1.toFixed(1)},${y1.toFixed(1)} A${RO},${RO} 0 0 1 ${x2.toFixed(1)},${y2.toFixed(1)} L${x3.toFixed(1)},${y3.toFixed(1)} A${RI},${RI} 0 0 0 ${x4.toFixed(1)},${y4.toFixed(1)} Z`;
+}
+/* names: {k: "small note"} drawn outside the ring; chords: [[k1,k2],...] dashed lines across the wheel */
+function wheelSvg(names, chords){
+  let s="";
+  HUES.forEach(([n,c],k)=>{ s+=`<path d="${sector(k)}" fill="${c}" stroke="#fff" stroke-width="3"/>`; });
+  (chords||[]).forEach(([a,b])=>{ const [x1,y1]=pt(RO-8,a),[x2,y2]=pt(RO-8,b);
+    s+=`<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="#fff" stroke-width="7" stroke-linecap="round"/><line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="#2b2622" stroke-width="3" stroke-dasharray="9 6" stroke-linecap="round"/>`; });
+  Object.keys(names||{}).forEach(k=>{
+    const [x,y]=pt(RO+14,+k), c=Math.cos(ang(+k)*Math.PI/180), anchor=c>.35?"start":(c<-.35?"end":"middle");
+    const dy=Math.sin(ang(+k)*Math.PI/180)>.9?18:(Math.sin(ang(+k)*Math.PI/180)<-.9?-8:5);
+    s+=`<text x="${x.toFixed(1)}" y="${(y+dy).toFixed(1)}" text-anchor="${anchor}" font-family="Lexend,sans-serif" font-size="18" font-weight="700" fill="#2b2622">${HUES[+k][0]}</text>`;
+    if(names[k]) s+=`<text x="${x.toFixed(1)}" y="${(y+dy+17).toFixed(1)}" text-anchor="${anchor}" font-family="Lexend,sans-serif" font-size="14" fill="#6b6155">${names[k]}</text>`;
+  });
+  return s;
+}
+/* slot center for wedge k, kept clear of the ring */
+function slotFor(k,W,H,sw,sh){
+  const c=Math.cos(ang(k)*Math.PI/180);
+  for(let R=RO+30;R<420;R+=4){
+    let [x,y]=pt(R,k); x+=c*sw/2*.9;
+    x=Math.max(sw/2+8,Math.min(W-sw/2-8,x)); y=Math.max(sh/2+6,Math.min(H-sh/2-6,y));
+    const dx=Math.max(Math.abs(x-WC[0])-sw/2,0), dy=Math.max(Math.abs(y-WC[1])-sh/2,0);
+    if(Math.hypot(dx,dy)>RO+46) return [Math.round(x),Math.round(y)];
+  }
+  return pt(300,k);
+}
+const WV=[1100,640];
+
+/* Hair swatch (a patch of strands) */
+function swatch(cx,col,dark){
+  let s=`<rect x="${cx-95}" y="70" width="190" height="150" rx="18" fill="${col}" stroke="${BROWN}" stroke-width="3"/>`;
+  for(let i=0;i<9;i++){ const x=cx-80+i*20; s+=`<path d="M${x},80 q8,35 0,70 q-8,35 0,60" fill="none" stroke="${dark}" stroke-width="3" opacity=".55" stroke-linecap="round"/>`; }
+  return s;
+}
+
+const ACTIVITIES = [
+  { id:"wheel", tab:"1 · The Color Wheel", title:"The Color Wheel",
+    read:`<p>The color wheel shows how colors relate to each other.</p>
+      <ul><li><b>Primary colors</b> are red, yellow, and blue. You cannot make them by mixing other colors.</li>
+      <li><b>Secondary colors</b> are orange, green, and violet. Each one is a mix of two primary colors.</li>
+      <li><b>Tertiary colors</b> are a mix of one primary and the secondary next to it. The name starts with the primary: <b>yellow-orange</b>, <b>red-violet</b>.</li></ul>`,
+    directions:"The wheel already names the primary and secondary colors. Drag the six tertiary names to the right wedges.",
+    vb:WV, slotW:180, slotH:46,
+    svg:wheelSvg({0:"primary",2:"secondary",4:"primary",6:"secondary",8:"primary",10:"secondary"}),
+    labels:[1,3,5,7,9,11].map(k=>({t:HUES[k][0], target:pt(125,k).map(Math.round), slot:slotFor(k,WV[0],WV[1],180,46)})),
+    explain:[
+      "<b>Yellow-Green:</b> yellow (primary) + green (secondary).",
+      "<b>Blue-Green:</b> blue (primary) + green (secondary).",
+      "<b>Blue-Violet:</b> blue (primary) + violet (secondary).",
+      "<b>Red-Violet:</b> red (primary) + violet (secondary).",
+      "<b>Red-Orange:</b> red (primary) + orange (secondary).",
+      "<b>Yellow-Orange:</b> yellow (primary) + orange (secondary)."
+    ]},
+  { id:"opp", tab:"2 · Opposites Cancel", title:"Opposites Cancel Each Other",
+    read:`<p>Colors that sit directly across from each other on the wheel are <b>complementary colors</b>. When you mix them, they cancel each other out. This is called <b>neutralizing</b>.</p>
+      <ul><li><b>Blue</b> cancels <b>orange</b>.</li>
+      <li><b>Violet</b> cancels <b>yellow</b>.</li>
+      <li><b>Green</b> cancels <b>red</b>.</li></ul>
+      <p>In hair color, we use this to cancel tones we do not want.</p>`,
+    directions:"Each dashed line connects two colors that cancel each other. Drag the color that cancels the unwanted tone.",
+    vb:WV, slotW:180, slotH:46,
+    svg:wheelSvg({0:"unwanted",8:"unwanted",10:"unwanted"},[[0,6],[8,2],[10,4]]),
+    labels:[
+      {t:"Blue",   target:pt(125,4).map(Math.round), slot:slotFor(4,WV[0],WV[1],180,46)},
+      {t:"Violet", target:pt(125,6).map(Math.round), slot:[550,592]},
+      {t:"Green",  target:pt(125,2).map(Math.round), slot:slotFor(2,WV[0],WV[1],180,46)}
+    ],
+    explain:[
+      "<b>Blue</b> cancels <b>orange</b>. Blue tones are used on brassy, orange hair.",
+      "<b>Violet</b> cancels <b>yellow</b>. Violet tones are used on yellow hair.",
+      "<b>Green</b> cancels <b>red</b>. Green tones are used on hair with a red cast."
+    ]},
+  { id:"fix", tab:"3 · Fix the Hair", title:"Which Color Fixes the Problem?",
+    read:`<p>Hair can end up with a tone the client does not want. To neutralize it, choose the color <b>across the wheel</b> from the unwanted tone.</p>
+      <ul><li>Orange hair needs <b>blue</b>.</li><li>Yellow hair needs <b>violet</b>.</li><li>Red hair needs <b>green</b>.</li><li>Green hair needs <b>red</b>.</li></ul>`,
+    directions:"Look at the problem above each hair swatch. Drag the color that neutralizes it.",
+    vb:[1100,420], slotW:200, slotH:46,
+    svg:swatch(137,"#d9772b","#a4501a")+swatch(412,"#e8d36a","#b49a2a")+swatch(687,"#b53a2e","#7d211a")+swatch(962,"#7f9f5e","#4f6e36"),
+    captions:[{x:137,y:48,t:"Too orange"},{x:412,y:48,t:"Too yellow"},{x:687,y:48,t:"Too red"},{x:962,y:48,t:"Too green"}],
+    labels:[
+      {t:"Blue",   target:[137,220], slot:[137,340]},
+      {t:"Violet", target:[412,220], slot:[412,340]},
+      {t:"Green",  target:[687,220], slot:[687,340]},
+      {t:"Red",    target:[962,220], slot:[962,340]}
+    ],
+    explain:[
+      "<b>Too orange:</b> use <b>blue</b>, which sits across from orange.",
+      "<b>Too yellow:</b> use <b>violet</b>, which sits across from yellow.",
+      "<b>Too red:</b> use <b>green</b>, which sits across from red.",
+      "<b>Too green:</b> use <b>red</b>, which sits across from green."
+    ]},
+  { id:"lift", tab:"4 · Lift and Neutralize", title:"Lift, Then Neutralize",
+    read:`<p>Dark hair is full of warm pigment. When you <b>lift</b> (lighten) it, the natural color does not just disappear. It changes in steps, and the warm pigment that is left behind is called the <b>underlying pigment</b>.</p>
+      <ul><li>Dark brown hair lifts through <b>red</b>.</li><li>Then it lifts through <b>orange</b>.</li><li>Then it lifts through <b>yellow</b>.</li></ul>
+      <p>If the client does not want that warm tone, use the color <b>across the wheel</b> to neutralize it. Think in two steps: <b>1.</b> What tone shows? <b>2.</b> What is across from it?</p>`,
+    directions:"Each swatch shows hair after lifting. First drag the tone that shows. Then drag the color that neutralizes it.",
+    vb:[1100,480], slotW:170, slotH:46,
+    svg:swatch(200,"#8a3b22","#5e2414")+swatch(550,"#c8741f","#96500f")+swatch(900,"#e6c34e","#b8962a"),
+    captions:[
+      {x:200,y:48,t:"Lifted a little (dark red-brown)"},{x:550,y:48,t:"Lifted more (light brown)"},{x:900,y:48,t:"Lifted a lot (light blonde)"},
+      {x:200,y:266,t:"Tone that shows"},{x:550,y:266,t:"Tone that shows"},{x:900,y:266,t:"Tone that shows"},
+      {x:200,y:374,t:"Neutralize with"},{x:550,y:374,t:"Neutralize with"},{x:900,y:374,t:"Neutralize with"}
+    ],
+    labels:[
+      {t:"Red",    target:[200,222], slot:[200,310]},
+      {t:"Orange", target:[550,222], slot:[550,310]},
+      {t:"Yellow", target:[900,222], slot:[900,310]},
+      {t:"Green",  target:[200,332], slot:[200,418]},
+      {t:"Blue",   target:[550,332], slot:[550,418]},
+      {t:"Violet", target:[900,332], slot:[900,418]}
+    ],
+    explain:[
+      "<b>Lifted a little:</b> the tone that shows is <b>red</b>.",
+      "<b>Lifted more:</b> the tone that shows is <b>orange</b>.",
+      "<b>Lifted a lot:</b> the tone that shows is <b>yellow</b>.",
+      "<b>Red</b> is neutralized by <b>green</b>, which sits across from it.",
+      "<b>Orange</b> is neutralized by <b>blue</b>, which sits across from it.",
+      "<b>Yellow</b> is neutralized by <b>violet</b>, which sits across from it."
+    ]}
+];
+
+
+/* ---------- State ---------- */
+const state={}; let current=ACTIVITIES[0].id; let selected=null;
+function shuffle(a){for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
+function initState(a){ state[a.id]={order:shuffle(a.labels.map((_,i)=>i)), slotOf:{}, checked:false, save:null}; } // slotOf[slotIndex]=labelIndex
+ACTIVITIES.forEach(initState);
+const act=()=>ACTIVITIES.find(a=>a.id===current);
+
+function renderTabs(){
+  const nav=document.getElementById("tabs"); nav.innerHTML="";
+  ACTIVITIES.forEach(a=>{const b=document.createElement("button");b.textContent=a.tab;b.setAttribute("role","tab");
+    b.setAttribute("aria-selected",a.id===current);b.onclick=()=>{current=a.id;selected=null;renderTabs();render();};nav.appendChild(b);});
+}
+
+function makeLabel(a,li,status){
+  const el=document.createElement("div"); el.className="label"; el.tabIndex=0; el.dataset.li=li; el.textContent=a.labels[li].t;
+  if(status) el.classList.add(status);
+  if(selected===li) el.classList.add("selected");
+  el.addEventListener("pointerdown",e=>startDrag(e,el,li));
+  el.addEventListener("keydown",e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();toggleSelect(li);}});
+  return el;
+}
+
+function render(){
+  const a=act(), s=state[a.id], [W,H]=a.vb;
+  const sheet=document.getElementById("sheet");
+  sheet.innerHTML=`<h2>${a.title}</h2>${a.read?`<details class="read" open><summary>📖 Read first <span class="tg">(tap to hide)</span></summary>${a.read}</details>`:""}<p class="directions">${a.directions}</p>`;
+  const placed=new Set(Object.values(s.slotOf));
+  const bank=document.createElement("div"); bank.className="bank"; bank.dataset.drop="bank";
+  bank.addEventListener("click",e=>{if(e.target===bank) placeSelected("bank");});
+  s.order.forEach(li=>{ if(!placed.has(li)) bank.appendChild(makeLabel(a,li)); });
+  if(!bank.children.length) bank.classList.add("empty");
+  sheet.appendChild(bank);
+
+  const scroller=document.createElement("div"); scroller.className="scroller";
+  const dia=document.createElement("div"); dia.className="diagram";
+  dia.style.width=`min(100%, calc((100vh - 190px) * ${W/H}))`; dia.style.minWidth="520px"; dia.style.margin="0 auto";
+  let leaders="";
+  a.labels.forEach(l=>{
+    const [tx,ty]=l.target,[sx,sy]=l.slot;
+    leaders+=`<line x1="${tx}" y1="${ty}" x2="${sx}" y2="${sy}" stroke="#2b2622" stroke-width="2" opacity=".55"/>`+
+             `<circle cx="${tx}" cy="${ty}" r="6" fill="#c8462f" stroke="#fff" stroke-width="2"/>`;
+  });
+  const caps=(a.captions||[]).map(c=>`<text x="${c.x}" y="${c.y}" text-anchor="middle" font-size="17" font-weight="700" font-family="Lexend,sans-serif" fill="#2b2622" stroke="#fff" stroke-width="5" paint-order="stroke">${c.t}</text>`).join("");
+  dia.innerHTML=`<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="${a.title} diagram">${a.svg}${leaders}${caps}</svg>`;
+  a.labels.forEach((l,si)=>{
+    const slot=document.createElement("div"); slot.className="slot"; slot.dataset.drop=si; slot.tabIndex=0;
+    slot.setAttribute("aria-label","Blank "+(si+1));
+    slot.style.left=((l.slot[0]-a.slotW/2)/W*100)+"%"; slot.style.top=((l.slot[1]-a.slotH/2)/H*100)+"%";
+    slot.style.width=(a.slotW/W*100)+"%"; slot.style.height=(a.slotH/H*100)+"%";
+    const li=s.slotOf[si];
+    if(li!==undefined){
+      slot.classList.add("filled");
+      const status=s.checked?(li===si?"right":"wrong"):null;
+      slot.appendChild(makeLabel(a,li,status));
+    }
+    slot.addEventListener("click",e=>{ if(!e.target.closest(".label")) placeSelected(si); });
+    slot.addEventListener("keydown",e=>{if((e.key==="Enter"||e.key===" ")&&e.target===slot){e.preventDefault();placeSelected(si);}});
+    dia.appendChild(slot);
+  });
+  scroller.appendChild(dia); sheet.appendChild(scroller);
+
+  const ctr=document.createElement("div"); ctr.className="controls";
+  const check=document.createElement("button"); check.className="btn primary"; check.textContent="Check my answers";
+  const reset=document.createElement("button"); reset.className="btn"; reset.textContent="Start over";
+  const score=document.createElement("span"); score.className="score";
+  check.onclick=()=>{s.checked=true;render();autoSave(a);}; reset.onclick=()=>{initState(a);selected=null;render();};
+  ctr.append(check,reset,score); sheet.appendChild(ctr);
+
+  if(s.checked){
+    const total=a.labels.length, right=a.labels.filter((_,si)=>s.slotOf[si]===si).length, blank=total-Object.keys(s.slotOf).length;
+    score.textContent=`${right} / ${total} correct`+(blank?` · ${blank} blank`:"");
+    const fb=document.createElement("div"); fb.className="feedback";
+    const list=`<ul>${a.explain.map(x=>`<li>${x}</li>`).join("")}</ul>`;
+    fb.innerHTML = right===total ? `<b>🎉 Perfect! Every label is in the right spot.</b>${list}`
+      : `<b>Keep going!</b> Move the red ✗ labels and check again.<details style="margin-top:8px"><summary style="cursor:pointer;font-weight:800">Need a hint?</summary>${list}</details>`;
+    const ss=document.createElement("div"); ss.id="saveStatus"; ss.className="savestatus"; fb.appendChild(ss);
+    sheet.appendChild(fb);
+  }
+  const tip=document.createElement("p"); tip.className="tip";
+  tip.textContent="Tip: drop a label on a blank that's already filled to swap them. Drag a label back to the top box to remove it. Keyboard: Tab to a label, press Enter, then Tab to a blank and press Enter.";
+  sheet.appendChild(tip);
+  if(s.checked) paintStatus(a);
+}
+
+/* ---------- Moving labels ---------- */
+function move(li,dest){
+  const s=state[current];
+  const from=Object.keys(s.slotOf).find(k=>s.slotOf[k]===li);
+  if(from!==undefined) delete s.slotOf[from];
+  if(dest!=="bank"){
+    const occupant=s.slotOf[dest];
+    if(occupant!==undefined && from!==undefined) s.slotOf[from]=occupant; // swap
+    s.slotOf[dest]=li;
+  }
+  s.checked=false;
+}
+function toggleSelect(li){selected=selected===li?null:li;render();focusLabel(li);}
+function focusLabel(li){const el=document.querySelector(`.label[data-li="${li}"]`);if(el)el.focus();}
+function placeSelected(dest){if(selected===null)return;const li=selected;move(li,dest);selected=null;render();focusLabel(li);}
+
+let drag=null;
+function startDrag(e,el,li){
+  if(e.button!==undefined&&e.button!==0)return; e.preventDefault();
+  const r=el.getBoundingClientRect();
+  drag={li,el,sx:e.clientX,sy:e.clientY,ox:e.clientX-r.left,oy:e.clientY-r.top,ghost:null,over:null,moved:false};
+  addEventListener("pointermove",onMove); addEventListener("pointerup",onUp); addEventListener("pointercancel",onCancel);
+}
+function dropAt(x,y){const el=document.elementFromPoint(x,y);return el?el.closest("[data-drop]"):null;}
+function onMove(e){
+  if(!drag)return;
+  if(!drag.moved){
+    if(Math.hypot(e.clientX-drag.sx,e.clientY-drag.sy)<6)return;
+    drag.moved=true; const g=drag.el.cloneNode(true); g.className="label ghost";
+    g.style.width="auto"; g.style.height="auto"; g.style.fontSize="15px"; g.style.padding="7px 11px";
+    document.body.appendChild(g); drag.ghost=g; drag.el.classList.add("dragging");
+  }
+  drag.ghost.style.left=(e.clientX-20)+"px"; drag.ghost.style.top=(e.clientY-18)+"px";
+  const t=dropAt(e.clientX,e.clientY);
+  if(drag.over!==t){ if(drag.over)drag.over.classList.remove("over"); drag.over=t; if(t&&t.classList.contains("slot"))t.classList.add("over"); }
+  const m=60; if(e.clientY<m)scrollBy(0,-12); else if(e.clientY>innerHeight-m)scrollBy(0,12);
+}
+function cleanup(){removeEventListener("pointermove",onMove);removeEventListener("pointerup",onUp);removeEventListener("pointercancel",onCancel);
+  if(drag&&drag.ghost)drag.ghost.remove(); if(drag&&drag.over)drag.over.classList.remove("over");}
+function onUp(e){
+  if(!drag)return; const d=drag; cleanup(); drag=null;
+  if(!d.moved){toggleSelect(d.li);return;}
+  const t=dropAt(e.clientX,e.clientY);
+  if(t){ const v=t.dataset.drop; move(d.li, v==="bank"?"bank":Number(v)); selected=null; }
+  render();
+}
+function onCancel(){cleanup();drag=null;render();}
+
+
+/* ---------- Auto-save results to the teacher's Google Sheet (Apps Script) ---------- */
+const CAN_SAVE = typeof google!=="undefined" && google.script && google.script.run;
+function studentInfo(){ return {name:document.getElementById("stuName").value.trim(), period:document.getElementById("stuPeriod").value.trim()}; }
+function activityResult(a){
+  const s=state[a.id];
+  const right=a.labels.filter((_,si)=>s.slotOf[si]===si).length, placed=Object.keys(s.slotOf).length;
+  const ans=a.labels.map((l,si)=>{const li=s.slotOf[si];return `${l.t} blank: ${li===undefined?"(empty)":a.labels[li].t} ${li===si?"✓":"✗"}`;}).join("; ");
+  return {right,total:a.labels.length,placed,ans};
+}
+function autoSave(a){
+  const s=state[a.id], st=studentInfo();
+  if(!CAN_SAVE){ s.save="preview"; paintStatus(a); return; }
+  if(!st.name){ s.save="needname"; paintStatus(a); return; }
+  const r=activityResult(a);
+  s.save="saving"; paintStatus(a);
+  google.script.run
+    .withSuccessHandler(()=>{ s.save="saved"; paintStatus(a); })
+    .withFailureHandler(()=>{ s.save="error"; paintStatus(a); })
+    .saveResults({name:st.name, period:st.period, rows:[{activity:document.title+": "+a.title,right:r.right,total:r.total,placed:r.placed,answers:r.ans}]});
+}
+const SAVE_MSG={saving:["Saving…",""],saved:["✅ Saved! Your teacher can see this activity.","ok"],
+  needname:["⚠️ Type your name at the top of the page. This activity will save as soon as you do.","bad"],
+  error:["⚠️ Could not save. Press Check my answers again to retry.","bad"],
+  preview:["Preview mode: saving is off.",""]};
+function paintStatus(a){
+  const s=state[a.id], el=document.getElementById("saveStatus");
+  if(el && current===a.id && s.checked && SAVE_MSG[s.save]){ el.textContent=SAVE_MSG[s.save][0]; el.className="savestatus "+SAVE_MSG[s.save][1]; }
+  renderProgress();
+}
+["stuName","stuPeriod"].forEach(id=>{
+  const el=document.getElementById(id);
+  try{ el.value=localStorage.getItem("culinary-"+id)||""; }catch(e){}
+  el.addEventListener("input",()=>{ try{localStorage.setItem("culinary-"+id,el.value);}catch(e){} });
+  el.addEventListener("change",()=>{ if(!studentInfo().name) return;
+    ACTIVITIES.forEach(a=>{ const s=state[a.id]; if(s.checked && (s.save==="needname"||s.save==="error")) autoSave(a); }); });
+});
+function renderProgress(){
+  const box=document.getElementById("submitAll"); if(!box) return;
+  box.innerHTML="<h2>📋 My progress</h2>";
+  const ul=document.createElement("ul");
+  ACTIVITIES.forEach(a=>{
+    const s=state[a.id], r=activityResult(a), li=document.createElement("li");
+    if(s.save==="saved"){ li.className="done"; li.textContent=`✓ ${a.title}: ${r.right} / ${r.total} (saved)`; }
+    else if(s.save==="saving"){ li.textContent=`• ${a.title}: saving…`; }
+    else if(s.save==="needname"||s.save==="error"){ li.className="todo"; li.textContent=`⚠ ${a.title}: not saved yet`; }
+    else { li.textContent=`• ${a.title}: not checked yet`; }
+    ul.appendChild(li);
+  });
+  box.appendChild(ul);
+  const sm=document.createElement("small"); sm.textContent="Each activity saves when you press Check my answers. You can retry any activity. Your newest score replaces the old one."; box.appendChild(sm);
+}
+const _renderOne=render; render=function(){ _renderOne(); renderProgress(); };
+renderTabs(); render();
+</script>
+</body>
+</html>
