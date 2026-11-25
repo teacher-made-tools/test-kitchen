@@ -1,0 +1,589 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Quick Breads Notebook</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,800&family=Lexend:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#fbf7ee; --line:#e6dcc6; --ink:#2b2622; --muted:#6f655a;
+    --tomato:#c8462f; --basil:#2f7d4f; --butter:#f3c969; --crust:#8a5a2b;
+    --card:#ffffff; --shadow:0 2px 0 rgba(43,38,34,.12), 0 6px 14px rgba(43,38,34,.08);
+  }
+  *{box-sizing:border-box}
+  body{margin:0;font-family:Lexend,system-ui,sans-serif;color:var(--ink);
+    background:var(--paper);
+    background-image:repeating-linear-gradient(to bottom, transparent 0 31px, var(--line) 31px 32px);
+    min-height:100vh}
+  header{padding:22px 20px 8px 64px;position:relative;max-width:1100px;margin:0 auto}
+  header::before{content:"";position:fixed;left:44px;top:0;bottom:0;width:2px;background:#e8a3a3;opacity:.7}
+  h1{font-family:Fraunces,Georgia,serif;font-weight:800;font-size:clamp(26px,4vw,38px);margin:0 0 4px}
+  .sub{color:var(--muted);margin:0;font-weight:700}
+  nav{display:flex;gap:8px;flex-wrap:wrap;padding:14px 20px 0 64px;max-width:1100px;margin:0 auto}
+  nav button{font:inherit;font-weight:800;border:2px solid var(--ink);background:#fff;border-radius:10px 10px 0 0;
+    padding:10px 16px;cursor:pointer;border-bottom-width:0;color:var(--ink)}
+  nav button[aria-selected="true"]{background:var(--butter)}
+  main{max-width:1100px;margin:0 auto;padding:0 20px 40px 64px}
+  .sheet{background:rgba(255,255,255,.85);border:2px solid var(--ink);border-radius:0 14px 14px 14px;padding:20px}
+  .sheet h2{font-family:Fraunces,Georgia,serif;margin:0 0 4px;font-size:24px}
+  .directions{margin:0 0 14px;color:var(--muted);font-weight:700}
+  .pool{min-height:78px;border:2px dashed #c9bda5;border-radius:12px;padding:10px;display:flex;flex-wrap:wrap;gap:8px;
+    background:#fffdf7;margin-bottom:16px;align-content:flex-start}
+  .pool.empty::after{content:"All placed! Press Check my answers.";color:var(--muted);font-weight:700;align-self:center;padding:6px}
+  .bins{display:grid;gap:12px}
+  .bins.cols{grid-template-columns:repeat(auto-fit,minmax(190px,1fr))}
+  .bin{border:2px solid var(--ink);border-radius:12px;background:#fff;display:flex;flex-direction:column;min-height:120px;transition:transform .12s, box-shadow .12s}
+  .bin h3{margin:0;padding:8px 12px;font-size:16px;border-bottom:2px solid var(--ink);border-radius:10px 10px 0 0;background:var(--bh,#f1ece0);cursor:pointer}
+  .bin h3 small{display:block;font-weight:700;color:var(--muted);font-size:12px}
+  .bin .drop{flex:1;padding:8px;display:flex;flex-wrap:wrap;gap:8px;align-content:flex-start;min-height:60px}
+  .bin.over{transform:scale(1.02);box-shadow:0 0 0 4px var(--butter)}
+  .bins.fridge{grid-template-columns:1fr;border:3px solid #6b7c8a;border-radius:18px;padding:12px;background:linear-gradient(#eef4f8,#dfe9f0)}
+  .bins.fridge .bin{min-height:84px;flex-direction:row}
+  .bins.fridge .bin h3{border-bottom:0;border-right:2px solid var(--ink);border-radius:10px 0 0 10px;width:130px;flex:none;display:flex;flex-direction:column;justify-content:center}
+  .card{touch-action:none;user-select:none;-webkit-user-select:none;background:var(--card);border:2px solid var(--ink);border-radius:10px;
+    padding:8px 12px;font-weight:800;cursor:grab;box-shadow:var(--shadow);display:inline-flex;align-items:center;gap:6px;font-size:15px}
+  .card:focus-visible{outline:3px solid var(--tomato);outline-offset:2px}
+  .card.selected{background:var(--butter)}
+  .card.dragging{opacity:.3}
+  .card.right{background:#dff1e5;border-color:var(--basil)}
+  .card.right::before{content:"✓";color:var(--basil)}
+  .card.wrong{background:#fbe1dc;border-color:var(--tomato)}
+  .card.wrong::before{content:"✗";color:var(--tomato)}
+  .ghost{position:fixed;pointer-events:none;z-index:50;transform:rotate(-3deg) scale(1.05);cursor:grabbing;box-shadow:0 10px 24px rgba(0,0,0,.2)}
+  .controls{display:flex;gap:10px;flex-wrap:wrap;margin-top:16px;align-items:center}
+  .btn{font:inherit;font-weight:800;border:2px solid var(--ink);border-radius:10px;padding:10px 18px;cursor:pointer;background:#fff;color:var(--ink);box-shadow:0 3px 0 var(--ink)}
+  .btn:active{transform:translateY(2px);box-shadow:0 1px 0 var(--ink)}
+  .btn.primary{background:var(--tomato);color:#fff}
+  .score{font-weight:800;font-size:18px}
+  .feedback{margin-top:14px;padding:12px 14px;border-radius:12px;background:#fff8e4;border:2px solid var(--butter);display:none}
+  .feedback.show{display:block}
+  .feedback ul{margin:6px 0 0;padding-left:20px}
+  .tip{font-size:13px;color:var(--muted);font-weight:700;margin-top:10px}
+  @media (max-width:600px){
+    header,nav,main{padding-left:16px} header::before{display:none}
+    .bins.fridge .bin{flex-direction:column}
+    .bins.fridge .bin h3{width:auto;border-right:0;border-bottom:2px solid var(--ink);border-radius:10px 10px 0 0}
+  }
+  .bins.steps{grid-template-columns:1fr;gap:8px}
+  .bins.steps .bin{min-height:58px;flex-direction:row}
+  .bins.steps .bin h3{border-bottom:0;border-right:2px solid var(--ink);border-radius:10px 0 0 10px;width:96px;flex:none;display:flex;align-items:center;background:var(--butter)}
+  .bins.steps .drop{min-height:50px;align-items:center}
+  .student{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px;align-items:center}
+  .student label{font-weight:800;display:flex;gap:6px;align-items:center}
+  .student input{font:inherit;font-weight:700;border:2px solid var(--ink);border-radius:9px;padding:7px 10px;background:#fff;min-width:0}
+  #stuName{width:220px} #stuPeriod{width:90px}
+  .send{margin-top:12px;padding-top:12px;border-top:2px dashed #e2c87a;display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+  .send .btn{background:var(--basil);color:#fff}
+  .send small{color:var(--muted);font-weight:700}
+  .submitAll{margin-top:18px;background:#fff;border:2px solid var(--ink);border-radius:14px;padding:16px 20px}
+  .submitAll h2{font-family:Fraunces,Georgia,serif;margin:0 0 6px;font-size:22px}
+  .submitAll ul{margin:6px 0 12px;padding-left:0;list-style:none;font-weight:700}
+  .submitAll .done{color:var(--basil)} .submitAll .todo{color:var(--tomato)}
+  .submitAll .btn{background:var(--basil);color:#fff}
+  
+  .submitAll small{display:block;margin-top:8px;color:var(--muted);font-weight:700}
+  .read{background:#fff8e4;border:2px solid var(--butter);border-radius:12px;padding:12px 16px;margin:10px 0 14px;line-height:1.55;font-size:15px;font-weight:500}
+  .read h3{margin:0 0 6px;font-size:16px;font-family:Fraunces,Georgia,serif}
+  .read p{margin:0 0 6px} .read ul{margin:4px 0 0;padding-left:20px} .read li{margin-bottom:3px}
+  .read b{font-weight:700}
+  .reftable{overflow-x:auto;margin-top:8px}
+  .reftable table{border-collapse:collapse;width:100%;min-width:520px;font-size:14px;background:#fff}
+  .reftable th,.reftable td{border:2px solid var(--ink);padding:6px 9px;text-align:left;vertical-align:top}
+  .reftable th{background:var(--butter)}
+  .hint{flex-basis:100%;color:var(--muted);font-weight:600;font-size:13px}
+  .savestatus{margin-top:10px;padding-top:10px;border-top:2px dashed #e2c87a;font-weight:700;font-size:14px}
+  .savestatus.ok{color:var(--basil)} .savestatus.bad{color:var(--tomato)}
+</style>
+</head>
+<body>
+<header>
+  <h1>Quick Breads Notebook</h1>
+  <p class="sub">Read the short box, then drag each card into the right spot. On a touchscreen you can also tap a card, then tap where it goes.</p>
+  <div class="student">
+    <label>Name <input id="stuName" autocomplete="name" placeholder="First and last name"></label>
+    <label>Period <input id="stuPeriod" placeholder="e.g. 3"></label>
+    <small class="hint">Type your name once. Your work saves automatically each time you press <b>Check my answers</b>.</small>
+  </div>
+</header>
+<nav role="tablist" id="tabs"></nav>
+<main><section class="sheet" id="sheet"></section><section class="submitAll" id="submitAll"></section></main>
+
+<script>
+const ACTIVITIES = [
+  {
+    id:"methods", tab:"1 · Meet the Methods",
+    title:"Meet the Three Mixing Methods",
+    read:`<p>Muffins, biscuits, and cakes use almost the same ingredients: flour, liquid, fat, and something to make them rise. They turn out different because of the <b>state of the fat</b> (melted, cold, or soft) and <b>how you mix it</b>. Each way of mixing has a name.</p>
+      <ul><li><b>Muffin method:</b> the fat is <b>melted butter or oil</b>. Mix the wet ingredients in one bowl and the dry in another. Then <b>stir just until the flour is wet</b>. Lumps are OK!</li>
+      <li><b>Biscuit method:</b> the fat is <b>cold and solid</b> (butter or shortening). You <b>cut the fat into the flour</b> and leave it in pea-sized pieces.</li>
+      <li><b>Creaming method:</b> the fat is <b>soft, room-temperature butter</b>. You <b>beat it with sugar</b> until it is pale and fluffy.</li></ul>`,
+    directions:"Use the reading. Drag each card to the mixing method it describes.",
+    layout:"cols",
+    bins:[
+      {id:"muffin", name:"Muffin method", note:"", color:"#fde2c4"},
+      {id:"biscuit", name:"Biscuit method", note:"", color:"#d6e9f5"},
+      {id:"cream", name:"Creaming method", note:"", color:"#e5dcf2"}
+    ],
+    items:[
+      ["Melted butter or oil","muffin"],["Stir just until the flour is wet","muffin"],["Lumps in the batter are OK","muffin"],
+      ["Cold, solid butter or shortening","biscuit"],["Cut the fat into the flour","biscuit"],["Fat stays in pea-sized pieces","biscuit"],
+      ["Soft, room-temperature butter","cream"],["Beat the butter with sugar","cream"],["Beat until pale and fluffy","cream"]
+    ],
+    explain:[
+      "<b>Muffin method:</b> liquid fat, wet and dry mixed separately, then stirred together gently.",
+      "<b>Biscuit method:</b> cold, solid fat cut into the flour.",
+      "<b>Creaming method:</b> soft butter beaten with sugar until fluffy."
+    ]
+  },
+  {
+    id:"batter", tab:"2 · Batter or Dough?",
+    title:"Batter or Dough?",
+    read:`<p>Mixtures are grouped by how much <b>liquid</b> they have.</p>
+      <ul><li><b>Batter</b> has more liquid, so you can pour it or scoop it.</li>
+      <li><b>Dough</b> has less liquid. It is stiff enough to roll out or shape by hand.</li></ul>
+      <p>Batters come in two kinds: <b>pour</b> (thin) and <b>drop</b> (thick). Think of it this way: you <b>pour</b> pancake batter, you <b>scoop</b> muffin batter, and you <b>roll out</b> biscuit dough.</p>`,
+    directions:"Drag each product to the mixture it starts as.",
+    layout:"cols",
+    bins:[
+      {id:"pour", name:"Pour batter", note:"Thin and runny, pours easily", color:"#d6e9f5"},
+      {id:"drop", name:"Drop batter", note:"Thick, drops from a spoon", color:"#fbeeb0"},
+      {id:"dough", name:"Soft dough", note:"Can be rolled, kneaded, and cut", color:"#ead7c3"}
+    ],
+    items:[
+      ["Pancakes","pour"],["Waffles","pour"],["Popovers","pour"],["Crêpes","pour"],
+      ["Muffins","drop"],["Cornbread","drop"],["Banana bread","drop"],["Zucchini loaf","drop"],
+      ["Biscuits","dough"],["Scones","dough"],["Irish soda bread","dough"],["Shortcakes","dough"]
+    ],
+    explain:[
+      "<b>Pour batters</b> have about equal amounts of liquid and flour, so they pour from a ladle or pitcher.",
+      "<b>Drop batters</b> have less liquid. They are too thick to pour, so you scoop or drop them into pans.",
+      "<b>Soft doughs</b> have the least liquid. They can be patted, rolled, and cut."
+    ]
+  },
+  {
+    id:"rise", tab:"3 · What Makes It Rise?",
+    title:"What Makes It Rise?",
+    read:`<p>Quick breads do not use yeast. To <b>rise</b>, they need gas or air inside. There are four ways:</p>
+      <ul><li><b>Baking soda</b> needs <b>moisture and an acid</b> (like buttermilk, cocoa, or molasses) to make gas.</li>
+      <li><b>Baking powder</b> is baking soda with a dry acid already mixed in. It only needs <b>moisture</b>.</li>
+      <li><b>Steam</b> forms when the water in cold butter heats up in the oven.</li>
+      <li><b>Trapped air</b> is beaten into soft butter and sugar.</li></ul>`,
+    directions:"Drag each clue to the thing it describes.",
+    layout:"cols",
+    bins:[
+      {id:"soda", name:"Baking soda", note:"", color:"#fde2c4"},
+      {id:"powder", name:"Baking powder", note:"", color:"#fbeeb0"},
+      {id:"steam", name:"Steam", note:"", color:"#d6e9f5"},
+      {id:"air", name:"Trapped air", note:"", color:"#e5dcf2"}
+    ],
+    items:[
+      ["Needs moisture AND an acid","soda"],["Works with buttermilk, cocoa, or molasses","soda"],["Needs a separate acid added to the recipe","soda"],
+      ["Acid is already mixed in","powder"],["Only needs moisture to start","powder"],["Soda plus a dry acid, like cream of tartar","powder"],
+      ["Made when water in cold butter heats up","steam"],["Pushes biscuit dough into layers","steam"],
+      ["Sugar crystals carve tiny pockets of it into butter","air"],["Made by creaming butter and sugar","air"]
+    ],
+    explain:[
+      "<b>Baking soda</b> is a base. It makes gas only when it meets liquid <b>and</b> an acid.",
+      "<b>Baking powder</b> already has the acid inside, so just adding moisture starts the gas.",
+      "<b>Steam</b> comes from the water in cold butter. <b>Trapped air</b> comes from creaming. Both help the batter lift in the oven."
+    ]
+  },
+  {
+    id:"texture", tab:"4 · Fat and Texture",
+    title:"How Fat Changes the Crumb",
+    read:`<p>The <b>state of the fat</b> decides what the baked product looks and feels like.</p>
+      <ul><li><b>Liquid fat</b> coats the flour. It cannot hold air or build layers.</li>
+      <li><b>Cold solid fat</b> stays in chunks. In the oven the chunks make steam and open up layers.</li>
+      <li><b>Soft fat</b> wraps around sugar crystals and traps tiny bubbles of air.</li></ul>`,
+    directions:"Drag each description to the fat state that causes it.",
+    layout:"cols",
+    bins:[
+      {id:"liquid", name:"Liquid fat", note:"Muffin method", color:"#fde2c4"},
+      {id:"cold", name:"Cold solid fat", note:"Biscuit method", color:"#d6e9f5"},
+      {id:"soft", name:"Soft fat", note:"Creaming method", color:"#e5dcf2"}
+    ],
+    items:[
+      ["Coats flour lightly so gluten stays short","liquid"],["Tender, slightly coarse crumb with small uneven holes","liquid"],["Cannot hold air or make layers","liquid"],
+      ["Chunks melt and make steam pockets","cold"],["Tall, flaky layers with crisp edges","cold"],["Steam pushes sheets of dough apart","cold"],
+      ["Wraps around sugar crystals to trap air","soft"],["Fine, even, velvety crumb","soft"],["Tiny air bubbles expand evenly in the oven","soft"]
+    ],
+    explain:[
+      "<b>Liquid fat:</b> it only coats the flour, so the crumb is soft and a little coarse. The rise comes from baking powder or soda.",
+      "<b>Cold solid fat:</b> each chunk melts into steam that pushes the dough up and apart. That makes flaky layers.",
+      "<b>Soft fat:</b> beating it with sugar fills it with tiny air bubbles. In the oven they expand evenly for a fine crumb."
+    ]
+  },
+  {
+    id:"products", tab:"5 · Name That Method",
+    title:"Name That Method",
+    read:`<p>Now use what you know. Each method gives a different texture:</p>
+      <ul><li><b>Muffin method:</b> tender, soft, a little coarse.</li>
+      <li><b>Biscuit method:</b> flaky layers.</li>
+      <li><b>Creaming method:</b> fine, soft, cake-like.</li></ul>`,
+    directions:"Read the clue on each card. Drag each product to the method that makes that texture.",
+    layout:"cols",
+    bins:[
+      {id:"muffin", name:"Muffin method", note:"Melted fat, stirred gently", color:"#fde2c4"},
+      {id:"biscuit", name:"Biscuit method", note:"Cold, solid fat cut in", color:"#d6e9f5"},
+      {id:"cream", name:"Creaming method", note:"Soft fat beaten with sugar", color:"#e5dcf2"}
+    ],
+    items:[
+      ["Blueberry muffins: tender, open crumb","muffin"],["Pancakes: stirred just until wet","muffin"],["Waffles: stirred just until wet","muffin"],["Cornbread: tender, a little coarse","muffin"],
+      ["Buttermilk biscuits: flaky layers","biscuit"],["Scones: cold butter cut in","biscuit"],["Shortcakes: tall, flaky layers","biscuit"],
+      ["Coffee cake: fine, soft crumb","cream"],["Lemon tea loaf: fine and velvety","cream"],["Pound cake: butter beaten with sugar","cream"]
+    ],
+    explain:[
+      "<b>Muffin method:</b> liquid fat and gentle stirring give a tender, slightly coarse crumb.",
+      "<b>Biscuit method:</b> cold fat cut in makes flaky layers.",
+      "<b>Creaming method:</b> beating soft butter with sugar gives a fine, cake-like crumb."
+    ]
+  },
+  {
+    id:"muffinsteps", tab:"6 · Muffin Steps", type:"order",
+    title:"Muffin Method: Put the Steps in Order",
+    read:`<p>Here is the whole chart, side by side. Look at it, then try the steps.</p>
+      <div class="reftable"><table>
+      <tr><th>Method</th><th>Fat</th><th>Rises from</th><th>Result</th></tr>
+      <tr><td><b>Muffin</b></td><td>Liquid</td><td>Baking powder or soda</td><td>Tender, a little coarse</td></tr>
+      <tr><td><b>Biscuit</b></td><td>Cold, solid</td><td>Steam + baking powder</td><td>Flaky layers</td></tr>
+      <tr><td><b>Creaming</b></td><td>Soft</td><td>Trapped air + baking powder</td><td>Fine, velvety</td></tr>
+      </table></div>`,
+    directions:"Drag each step into the right spot, from Step 1 to Step 6.",
+    layout:"steps",
+    steps:[
+      "Sift the dry ingredients together.",
+      "Whisk the eggs, then add the milk and melted fat.",
+      "Pour the liquids into the dry ingredients.",
+      "Mix just until the flour is moistened. Lumps are OK!",
+      "Scoop the batter into greased or lined muffin tins.",
+      "Bake right away."
+    ],
+    explain:[
+      "<b>Why stop mixing while it is still lumpy?</b> Extra stirring makes gluten. That gives tough muffins with tunnels and pointed tops.",
+      "<b>Why bake right away?</b> Baking powder starts working as soon as it gets wet. If the batter sits, you lose rise."
+    ]
+  },
+  {
+    id:"biscuitsteps", tab:"7 · Biscuit Steps", type:"order",
+    title:"Biscuit Method: Put the Steps in Order",
+    read:`<p>For flaky biscuits, keep the fat <b>cold</b> and handle the dough <b>gently</b>.</p>`,
+    directions:"Drag each step into the right spot, from Step 1 to Step 7.",
+    layout:"steps",
+    steps:[
+      "Sift the dry ingredients together.",
+      "Cut in the cold fat until it looks like coarse cornmeal.",
+      "Combine the liquid ingredients.",
+      "Add the liquid and mix just until a soft dough forms.",
+      "Knead lightly, about 10 to 12 times.",
+      "Roll out and cut straight down. Don't twist the cutter!",
+      "Place on a sheet pan and bake."
+    ],
+    explain:[
+      "<b>Keep the fat cold:</b> solid bits of fat melt in the oven and make steam, which creates flaky layers.",
+      "<b>Knead lightly:</b> a few turns help biscuits rise evenly. Too much kneading makes them tough.",
+      "<b>Do not twist the cutter:</b> twisting seals the edges, so the biscuits rise crooked."
+    ]
+  },
+  {
+    id:"creamsteps", tab:"8 · Creaming Steps", type:"order",
+    title:"Creaming Method: Put the Steps in Order",
+    read:`<p>For a light cake, the secret is in the first steps. Soft butter and sugar get <b>beaten until pale and fluffy</b> to trap air.</p>`,
+    directions:"Drag each step into the right spot, from Step 1 to Step 6.",
+    layout:"steps",
+    steps:[
+      "Let the butter soften to room temperature.",
+      "Beat the butter and sugar until pale and fluffy.",
+      "Beat in the eggs, one at a time.",
+      "Mix the dry ingredients together in a separate bowl.",
+      "Add the dry ingredients and milk in turns, a little at a time.",
+      "Pour the batter into a pan and bake."
+    ],
+    explain:[
+      "<b>Why cream first?</b> Sugar crystals cut tiny air pockets into soft butter. Those pockets make the cake light.",
+      "<b>Why add eggs slowly?</b> It helps the mixture hold on to all of that air.",
+      "<b>Why alternate dry and milk?</b> It keeps the batter smooth and keeps gluten gentle."
+    ]
+  },
+  {
+    id:"trouble", tab:"9 · Troubleshooting",
+    title:"What Went Wrong?",
+    read:`<p>When a recipe fails, the finished product gives you clues. Think about what each mistake does:</p>
+      <ul><li><b>Overmixing</b> makes too much gluten.</li>
+      <li><b>Warm butter</b> in biscuits smears into the flour instead of staying in chunks.</li>
+      <li><b>Melted butter</b> in a creamed cake cannot trap air.</li>
+      <li><b>Soda without enough acid</b> leaves unused soda behind.</li></ul>`,
+    directions:"Read each clue about the finished product. Drag it to the mistake that most likely caused it.",
+    layout:"cols",
+    bins:[
+      {id:"over", name:"Overmixed", note:"Stirred too long", color:"#fbe1dc"},
+      {id:"warm", name:"Butter got warm", note:"Biscuit dough", color:"#d6e9f5"},
+      {id:"melted", name:"Butter was melted", note:"Creamed cake", color:"#e5dcf2"},
+      {id:"soda", name:"Soda problem", note:"Too much, or no acid", color:"#fbeeb0"}
+    ],
+    items:[
+      ["Long tunnels inside the muffin","over"],["Tough, chewy bite","over"],["Pointed, peaked top","over"],
+      ["Biscuits spread out flat","warm"],["Crumbly, with no flaky layers","warm"],["Short, dense biscuits","warm"],
+      ["Dense, heavy cake","melted"],["Slightly greasy, no fine crumb","melted"],["Cake baked flat","melted"],
+      ["Soapy, bitter taste","soda"],["Dark spots or yellow-brown color","soda"],["Barely rose","soda"]
+    ],
+    explain:[
+      "<b>Overmixing</b> builds long gluten bands. Gas rushes up through tunnels and the top rises to a peak.",
+      "<b>Warm butter</b> melts into the flour. With no solid chunks there is no steam to build layers, so biscuits spread.",
+      "<b>Melted butter</b> cannot hold air, so a creamed cake loses its fine, light crumb.",
+      "<b>Baking soda problems:</b> soda that has no acid to react with tastes soapy and leaves dark spots."
+    ]
+  },
+  {
+    id:"bigidea", tab:"10 · The Big Idea",
+    title:"Put It All Together",
+    read:`<p><b>The big idea:</b> the same few ingredients make very different foods. The difference is the <b>state of the fat</b> and <b>how you mix</b>.</p>
+      <ul><li><b>Muffin:</b> liquid fat, stir gently, rises from baking powder or soda.</li>
+      <li><b>Biscuit:</b> cold fat, cut in, rises with steam.</li>
+      <li><b>Creaming:</b> soft fat beaten with sugar, rises with trapped air.</li></ul>`,
+    directions:"Drag each tip to the mixing method it belongs to.",
+    layout:"cols",
+    bins:[
+      {id:"muffin", name:"Muffin method", note:"", color:"#fde2c4"},
+      {id:"biscuit", name:"Biscuit method", note:"", color:"#d6e9f5"},
+      {id:"cream", name:"Creaming method", note:"", color:"#e5dcf2"}
+    ],
+    items:[
+      ["Stop stirring while it is still lumpy","muffin"],["Mix the wet and dry in two separate bowls","muffin"],["Rises mostly from baking powder or soda gas","muffin"],
+      ["Keep the fat cold","biscuit"],["Cut the fat in until it looks like coarse cornmeal","biscuit"],["Steam from melting fat chunks helps it lift","biscuit"],
+      ["Beat until pale and fluffy","cream"],["Start with soft, room-temperature butter","cream"],["Trapped air helps it lift","cream"]
+    ],
+    explain:[
+      "<b>Muffin:</b> little mixing, liquid fat. <b>Biscuit:</b> cold fat and steam. <b>Creaming:</b> soft fat and trapped air.",
+      "Fat state + mixing decides the texture: tender, flaky, or fine and velvety."
+    ]
+  }
+];
+// build numbered slots for "order" activities
+ACTIVITIES.forEach(a=>{ if(a.type==="order"){
+  a.bins=a.steps.map((_,k)=>({id:"p"+(k+1), name:"Step "+(k+1), note:""}));
+  a.items=a.steps.map((t,k)=>[t,"p"+(k+1)]);
+}});
+const state = {};       // activityId -> {cardId: binId|null}
+let current = ACTIVITIES[0].id;
+let selected = null;    // tap-to-move selection
+
+function shuffle(a){for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
+
+function initState(act){
+  const order = shuffle(act.items.map((_,i)=>i));
+  state[act.id] = {order, place:{}, checked:false};
+  order.forEach(i=>state[act.id].place[i]=null);
+}
+ACTIVITIES.forEach(initState);
+
+function renderTabs(){
+  const nav=document.getElementById("tabs"); nav.innerHTML="";
+  ACTIVITIES.forEach(a=>{
+    const b=document.createElement("button");
+    b.textContent=a.tab; b.setAttribute("role","tab");
+    b.setAttribute("aria-selected", a.id===current);
+    b.onclick=()=>{current=a.id; selected=null; renderTabs(); render();};
+    nav.appendChild(b);
+  });
+}
+
+function makeCard(act,i){
+  const s=state[act.id];
+  const c=document.createElement("div");
+  c.className="card"; c.tabIndex=0; c.dataset.i=i;
+  c.textContent=act.items[i][0];
+  if(s.checked && s.place[i]!==null){
+    c.classList.add(s.place[i]===act.items[i][1]?"right":"wrong");
+  }
+  if(selected===i) c.classList.add("selected");
+  c.addEventListener("pointerdown",e=>startDrag(e,c,act,i));
+  c.addEventListener("keydown",e=>{
+    if(e.key==="Enter"||e.key===" "){e.preventDefault(); toggleSelect(i);}
+  });
+  return c;
+}
+
+function render(){
+  const act=ACTIVITIES.find(a=>a.id===current), s=state[act.id];
+  const sheet=document.getElementById("sheet");
+  sheet.innerHTML=`<h2>${act.title}</h2>${act.read?`<div class="read"><h3>📖 Read first</h3>${act.read}</div>`:""}<p class="directions">${act.directions}</p>`;
+  const pool=document.createElement("div"); pool.className="pool"; pool.dataset.bin="";
+  pool.setAttribute("aria-label","Cards to sort");
+  pool.addEventListener("click",e=>{if(e.target===pool) placeSelected(null);});
+  sheet.appendChild(pool);
+  const bins=document.createElement("div"); bins.className="bins "+act.layout;
+  act.bins.forEach(b=>{
+    const el=document.createElement("div"); el.className="bin"; el.dataset.bin=b.id;
+    if(b.color) el.style.setProperty("--bh",b.color);
+    el.innerHTML=`<h3 tabindex="0">${b.name}${b.note?`<small>${b.note}</small>`:""}</h3><div class="drop"></div>`;
+    const h=el.querySelector("h3");
+    el.addEventListener("click",e=>{ if(!e.target.closest(".card")) placeSelected(b.id); });
+    h.addEventListener("keydown",e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();placeSelected(b.id);}});
+    bins.appendChild(el);
+  });
+  sheet.appendChild(bins);
+  s.order.forEach(i=>{
+    const where=s.place[i];
+    const target = where===null ? pool : bins.querySelector(`[data-bin="${where}"] .drop`);
+    target.appendChild(makeCard(act,i));
+  });
+  if(!pool.children.length) pool.classList.add("empty");
+
+  const ctr=document.createElement("div"); ctr.className="controls";
+  const check=document.createElement("button"); check.className="btn primary"; check.textContent="Check my answers";
+  const reset=document.createElement("button"); reset.className="btn"; reset.textContent="Start over";
+  const score=document.createElement("span"); score.className="score";
+  check.onclick=()=>{s.checked=true; render(); autoSave(act);};
+  reset.onclick=()=>{initState(act); selected=null; render();};
+  ctr.append(check,reset,score); sheet.appendChild(ctr);
+
+  const fb=document.createElement("div"); fb.className="feedback";
+  if(s.checked){
+    const total=act.items.length;
+    const right=s.order.filter(i=>s.place[i]===act.items[i][1]).length;
+    const unplaced=s.order.filter(i=>s.place[i]===null).length;
+    score.textContent=`${right} / ${total} correct` + (unplaced?` · ${unplaced} not sorted yet`:"");
+    if(right===total){
+      fb.innerHTML=`<b>🎉 Perfect! Every card is in the right place.</b><ul>${act.explain.map(x=>`<li>${x}</li>`).join("")}</ul>`;
+    } else {
+      fb.innerHTML=`<b>Keep going!</b> Move the red ✗ cards and check again.`+
+        `<details style="margin-top:8px"><summary style="cursor:pointer;font-weight:800">Need a hint?</summary><ul>${act.explain.map(x=>`<li>${x}</li>`).join("")}</ul></details>`;
+    }
+    const ss=document.createElement("div"); ss.id="saveStatus"; ss.className="savestatus"; fb.appendChild(ss);
+    fb.classList.add("show");
+  }
+  sheet.appendChild(fb);
+  if(s.checked) paintStatus(act);
+  const tip=document.createElement("p"); tip.className="tip";
+  tip.textContent="Tip: drag a card back to the top box to take it out of a group. Keyboard: Tab to a card, press Enter, then Tab to a group name and press Enter.";
+  sheet.appendChild(tip);
+}
+
+function toggleSelect(i){ selected = selected===i ? null : i; render(); focusCard(i); }
+function focusCard(i){ const c=document.querySelector(`.card[data-i="${i}"]`); if(c) c.focus(); }
+
+function placeSelected(binId){
+  if(selected===null) return;
+  move(selected,binId); const i=selected; selected=null; render(); focusCard(i);
+}
+function move(i,binId){
+  const s=state[current], a=ACTIVITIES.find(x=>x.id===current);
+  const prev=s.place[i];
+  if(a.type==="order" && binId!==null){
+    const occ=Object.keys(s.place).find(k=>s.place[k]===binId && Number(k)!==i);
+    if(occ!==undefined) s.place[occ]=prev; // swap (or back to the pool)
+  }
+  s.place[i]=binId; s.checked=false;
+}
+
+/* ---- Pointer drag (mouse + touch + pen) ---- */
+let drag=null;
+function startDrag(e,card,act,i){
+  if(e.button!==undefined && e.button!==0) return;
+  e.preventDefault();
+  const r=card.getBoundingClientRect();
+  drag={i,card,startX:e.clientX,startY:e.clientY,offX:e.clientX-r.left,offY:e.clientY-r.top,ghost:null,overEl:null,moved:false};
+  window.addEventListener("pointermove",onMove);
+  window.addEventListener("pointerup",onUp);
+  window.addEventListener("pointercancel",onCancel);
+}
+function onMove(e){
+  if(!drag) return;
+  if(!drag.moved){
+    if(Math.hypot(e.clientX-drag.startX,e.clientY-drag.startY)<6) return;
+    drag.moved=true;
+    const g=drag.card.cloneNode(true); g.classList.add("ghost"); g.classList.remove("right","wrong","selected");
+    g.style.width=drag.card.offsetWidth+"px";
+    document.body.appendChild(g); drag.ghost=g; drag.card.classList.add("dragging");
+  }
+  drag.ghost.style.left=(e.clientX-drag.offX)+"px";
+  drag.ghost.style.top=(e.clientY-drag.offY)+"px";
+  const t=targetAt(e.clientX,e.clientY);
+  if(drag.overEl!==t){
+    if(drag.overEl) drag.overEl.classList.remove("over");
+    drag.overEl=t; if(t&&t.classList.contains("bin")) t.classList.add("over");
+  }
+  // auto-scroll near edges
+  const m=60; if(e.clientY<m) window.scrollBy(0,-12); else if(e.clientY>innerHeight-m) window.scrollBy(0,12);
+}
+function targetAt(x,y){
+  const el=document.elementFromPoint(x,y);
+  return el ? el.closest(".bin, .pool") : null;
+}
+function cleanup(){
+  window.removeEventListener("pointermove",onMove);
+  window.removeEventListener("pointerup",onUp);
+  window.removeEventListener("pointercancel",onCancel);
+  if(drag&&drag.ghost) drag.ghost.remove();
+  if(drag&&drag.overEl) drag.overEl.classList.remove("over");
+}
+function onUp(e){
+  if(!drag) return;
+  const d=drag; cleanup(); drag=null;
+  if(!d.moved){ toggleSelect(d.i); return; }   // a tap selects
+  const t=targetAt(e.clientX,e.clientY);
+  if(t){ move(d.i, t.dataset.bin||null); selected=null; }
+  render();
+}
+function onCancel(){ cleanup(); drag=null; render(); }
+
+/* ---------- Auto-save results to the teacher's Google Sheet (Apps Script) ---------- */
+const CAN_SAVE = typeof google!=="undefined" && google.script && google.script.run;
+function studentInfo(){ return {name:document.getElementById("stuName").value.trim(), period:document.getElementById("stuPeriod").value.trim()}; }
+function activityResult(a){
+  const s=state[a.id], short=t=>t.length>45?t.slice(0,42)+"…":t;
+  const right=a.items.filter((it,i)=>s.place[i]===it[1]).length, placed=a.items.filter((_,i)=>s.place[i]!==null).length;
+  const ans=a.items.map((it,i)=>{const b=a.bins.find(x=>x.id===s.place[i]);return `${short(it[0])} → ${b?b.name:"(not placed)"} ${s.place[i]===it[1]?"✓":"✗"}`;}).join("; ");
+  return {right,total:a.items.length,placed,ans};
+}
+function autoSave(act){
+  const s=state[act.id], st=studentInfo();
+  if(!CAN_SAVE){ s.save="preview"; paintStatus(act); return; }
+  if(!st.name){ s.save="needname"; paintStatus(act); return; }
+  const r=activityResult(act);
+  s.save="saving"; paintStatus(act);
+  google.script.run
+    .withSuccessHandler(()=>{ s.save="saved"; paintStatus(act); })
+    .withFailureHandler(()=>{ s.save="error"; paintStatus(act); })
+    .saveResults({name:st.name, period:st.period, rows:[{activity:act.title,right:r.right,total:r.total,placed:r.placed,answers:r.ans}]});
+}
+const SAVE_MSG={saving:["Saving…",""],saved:["✅ Saved! Your teacher can see this activity.","ok"],
+  needname:["⚠️ Type your name at the top of the page. This activity will save as soon as you do.","bad"],
+  error:["⚠️ Could not save. Press Check my answers again to retry.","bad"],
+  preview:["Preview mode: saving is off.",""]};
+function paintStatus(act){
+  const s=state[act.id], el=document.getElementById("saveStatus");
+  if(el && current===act.id && s.checked && SAVE_MSG[s.save]){ el.textContent=SAVE_MSG[s.save][0]; el.className="savestatus "+SAVE_MSG[s.save][1]; }
+  renderSubmitAll();
+}
+["stuName","stuPeriod"].forEach(id=>{
+  const el=document.getElementById(id);
+  try{ el.value=localStorage.getItem("culinary-"+id)||""; }catch(e){}
+  el.addEventListener("input",()=>{ try{localStorage.setItem("culinary-"+id,el.value);}catch(e){} });
+  // when a name is typed, save any activities that were checked before it was entered
+  el.addEventListener("change",()=>{ if(!studentInfo().name) return;
+    ACTIVITIES.forEach(a=>{ const s=state[a.id]; if(s.checked && (s.save==="needname"||s.save==="error")) autoSave(a); }); });
+});
+/* ---------- Progress box ---------- */
+function renderSubmitAll(){
+  const box=document.getElementById("submitAll"); if(!box) return;
+  box.innerHTML="<h2>📋 My progress</h2>";
+  const ul=document.createElement("ul");
+  ACTIVITIES.forEach(a=>{
+    const s=state[a.id], r=activityResult(a), li=document.createElement("li");
+    if(s.save==="saved"){ li.className="done"; li.textContent=`✓ ${a.title}: ${r.right} / ${r.total} (saved)`; }
+    else if(s.save==="saving"){ li.textContent=`• ${a.title}: saving…`; }
+    else if(s.save==="needname"||s.save==="error"){ li.className="todo"; li.textContent=`⚠ ${a.title}: not saved yet`; }
+    else { li.textContent=`• ${a.title}: not checked yet`; }
+    ul.appendChild(li);
+  });
+  box.appendChild(ul);
+  const sm=document.createElement("small"); sm.textContent="Each activity saves when you press Check my answers. You can retry any activity. Your newest score replaces the old one."; box.appendChild(sm);
+}
+const _renderOne=render; render=function(){ _renderOne(); renderSubmitAll(); };
+renderTabs(); render();
+</script>
+</body>
+</html>
